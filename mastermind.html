@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8"/>
+	<meta name="description" content="Mastermind Game"/>
+  <meta name="designer" content=" Ashvini Hunagund"/>
+	<meta name="keywords" content="keypad,difficulty,challenge"/>
+
+  <title>Game Page</title>
+
+  <link rel="stylesheet" type="text/css" href="css/browser_reset.css"/>
+  <link rel="stylesheet" type="text/css" href="css/main.css"/>
+
+  <style>
+    *{margin: 0px; padding: 0px; box-sizing: border-box; margin-left: auto; margin-right: auto;}
+    html,body{width: 100%, height: 100%;} /* overflow:hidden; */
+    /* apply overflow hidden to another element if your canvas is wdith to width....look for akward scroll bars */
+
+    #myCanvas{display: block; background-color:#000039; margin-left: auto; margin-right: auto; border:white 2px solid;}
+
+    header,footer{
+      width:1000px;
+      background-color: black;
+      color:white;
+      margin:10px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+   section{
+      background-color: inherit;
+      width:1000px;
+      color:white;
+      margin:10px;
+      margin-left: auto;
+      margin-right: auto;
+      border:none;
+    }
+
+    #somew{
+      background-color:#181D23;
+      border-radius: 100%;
+      padding:2px;
+      border:white 2px solid;
+      margin-top:20px;
+    }
+
+    h1{
+      font-size:2.2em;
+    }
+
+    h4{
+      font-size:1.3em;
+      margin:10px;
+      text-decoration: underline;
+    }
+
+    section p{
+      font-style: italic;
+    }
+
+    footer{
+      padding:2px;
+    }
+
+    section input[type="radio"]{
+    	opacity: 0;
+      margin:20px;
+      margin-top:30px;
+    }
+
+    section label{
+    	display: block inline;
+    	background-color:#524324;
+    	transition-duration:0.4s;
+    	border-radius: 3px;
+    	padding:5px;
+    	margin:80px;
+      margin-left:20px;
+      font-size: 20px;
+      border:white 1px solid;
+    }
+
+    section label:hover {
+    	background-color: #C2A55B;
+    	transition-duration:0.4s;
+    	border: 1px;
+      border:white 2px solid;
+    }
+
+    section input[type="radio"]:checked + label{
+    	background-color: #3AAC4A;
+      border:white 2px solid;
+    }
+
+    .gone{
+      display:none;
+    }
+
+  </style>
+</head>
+
+<body>
+<div id="maingrid">
+
+  <header>
+
+    <h1>Game Page</h1>
+
+    <nav>
+    		<a href ="about.html">Home</a>
+    		<a style="background-color:#721617; border-radius: 6px; color:white; padding:5px;" href ="mastermind.html">Play Now</a></span>
+    		<a href="reflect.html">Reflection</a>
+    </nav>
+
+  </header>
+
+  <section style="text-align:center;">
+
+    <div id="somew">
+
+    <h4>Choose your Desired Challenge</h4>
+    <p>Please click anywhere on the keypad to activate it after you chose your difficulty.</p>
+
+  </div>
+
+  <div id="choosediff">
+
+      <input type="radio" name="difficulty" id="e" value="e" onClick="first();"/>
+      <label for ="e">Easy</label>
+
+      <input type="radio" name="difficulty" id="m" value="m" onClick="second();"/>
+      <label for ="m">Medium</label>
+
+      <input type="radio" name="difficulty" id="h" value="h" onClick="third();"/>
+      <label for ="h">Hard</label>
+</div>
+
+    </section>
+
+  <canvas id="myCanvas" tabindex="1"></canvas>
+
+  <footer>
+
+        <p> Website Designed and Coded by: Ashvini Hunagund<br>
+        Phone Inquires: 123-456-7890<br>
+        E-mail: me@gmail.com</p>
+
+  </footer>
+
+
+
+  <script>
+
+    var canvas = document.getElementById('myCanvas');
+    canvas.width = 1000;
+    canvas.height = window.innerHeight;
+    var c = canvas.getContext("2d");
+
+
+function first(){
+  c.clearRect(0,0,canvas.width,canvas.height);
+
+  var byeform = document.querySelector("#choosediff");
+  byeform.classList.add("gone");
+
+
+/* Drawing the empty spots */
+    var fx = -30;
+    for (var xspots = 0; xspots < 9; xspots++){
+      fx+=100;
+      var fy = 190;
+
+      for(var yspots = 0; yspots < 4; yspots++){
+        c.strokeStyle = "white";
+        c.fillStyle = "white";
+        c.strokeWidth = 5;
+        c.fillRect(fx, fy, 40, 40);
+        c.fill();
+        c.stroke();
+        fy+= 130;
+      }
+    }
+
+/* Drawing the empty bottom teller thingie */
+      var tx = 60;
+      for(var tspots = 0; tspots < 9; tspots++){
+        c.strokeStyle = "white";
+        c.fillStyle = "white";
+        c.strokeWidth = 5;
+        c.fillRect(tx, 700, 60, 60);
+        c.fill();
+        c.stroke();
+
+        tx += 100;
+      }
+
+
+/* AI picks a Code */
+
+    /*
+        1 = blue
+        2 = red
+        3 = green
+        4 = yellow
+        5 = black
+        6 = white
+     */
+
+var ans = [];
+
+var alluguess = [];
+
+  var c1 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+  ans.push(c1);
+  var c2 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+  ans.push(c2);
+  var c3 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+  ans.push(c3);
+  var c4 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+  ans.push(c4);
+
+  alert("code is " + ans);
+  var cnumguess = -1;
+
+
+  canvas.addEventListener("keydown", L1game);
+
+  function L1game(e){
+    var uguess = String.fromCharCode(e.keyCode);
+
+    alluguess.push(uguess);
+
+    cnumguess += 1;
+
+    if(cnumguess < 4){
+      var nx = 70;
+      var ny = 190 + 130 * cnumguess;
+
+    }else if (3 < cnumguess && cnumguess < 8){
+
+      var nx = 170;
+      var ny = 190 + 130 * (cnumguess - 4);
+
+    }else if (7 < cnumguess && cnumguess < 12){
+      var nx = 270;
+      var ny = 190 + 130 * (cnumguess - 8);
+
+    }else if (11 < cnumguess && cnumguess < 16){
+      var nx = 370;
+      var ny = 190 + 130 * (cnumguess - 12);
+
+    }else if (15 < cnumguess && cnumguess < 20){
+      var nx = 470;
+      var ny = 190 + 130 * (cnumguess - 16);
+
+    }else if (19 < cnumguess && cnumguess < 24){
+      var nx = 570;
+      var ny = 190 + 130 * (cnumguess - 20);
+
+    }else if (23 < cnumguess && cnumguess < 28){
+      var nx = 670;
+      var ny = 190 + 130 * (cnumguess - 24);
+
+    }else if (27 < cnumguess && cnumguess < 32){
+      var nx = 770;
+      var ny = 190 + 130 * (cnumguess - 28);
+
+    }else if (31 < cnumguess && cnumguess < 36){
+      var nx = 870;
+      var ny = 190 + 130 * (cnumguess - 32);
+    }
+
+
+      if(uguess == '1'){
+
+        c.fillStyle = "#75AAFC";
+        c.fillRect(nx, ny, 40, 40);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "blue";
+        c.fillText("1", nx + 13, ny + 27);
+
+      }else if(uguess == '2'){
+
+        c.fillStyle = "#EB9185";
+        c.fillRect(nx, ny, 40, 40);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "red";
+        c.fillText("2", nx + 13, ny + 27);
+
+      } else if(uguess == '3'){
+
+        c.fillStyle = "#83FF9A";
+        c.fillRect(nx, ny, 40, 40);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "green";
+        c.fillText("3", nx + 13, ny + 27);
+
+      }else if(uguess == '4'){
+
+        c.fillStyle = "#EEE294";
+        c.fillRect(nx, ny, 40, 40);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "#968F00";
+        c.fillText("4", nx + 13, ny + 27);
+
+      }else if(uguess == '5'){
+
+        c.fillStyle = "#212121";
+        c.fillRect(nx, ny, 40, 40);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "white";
+        c.fillText("5", nx + 13, ny + 27);
+
+      }else if(uguess == '6'){
+
+        c.fillStyle = "#F7F7F7";
+        c.fillRect(nx, ny, 40, 40);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "black";
+        c.fillText("6", nx + 11, ny + 27);
+
+      }//uguess ifs
+
+
+      if(cnumguess == 3 || cnumguess == 7 || cnumguess == 11 || cnumguess == 15 || cnumguess == 19 || cnumguess == 23 || cnumguess == 27 ||cnumguess == 31 || cnumguess == 35 ){
+
+
+        ans = [c1,c2,c3,c4];
+
+        var tempans = ans;
+
+        var qwin = 0;
+
+        var cutguess = (alluguess.slice((cnumguess - 3), (cnumguess + 1)));
+
+        var pegpos = [1,2,3,4];
+
+        for(var b = 0; b < 4; b++){
+          if(cutguess[b] == tempans[b]){
+
+            var where = Math.floor(Math.random() * pegpos.length);
+
+            var rights = (pegpos[where]);
+
+            pegpos.splice(where, 1);
+
+            qwin += 1;
+
+            if(rights == 1){
+              c.beginPath();
+              c.arc(nx + 10,720,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+            } else if(rights == 2){
+              c.beginPath();
+              c.arc(nx + 30 ,720,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+            }else if(rights == 3){
+              c.beginPath();
+              c.arc(nx + 10,740,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+            }else if(rights == 4){
+              c.beginPath();
+              c.arc(nx + 30,740,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+              c.closePath();
+            }
+            tempans[b] = "r";
+            cutguess[b]= "s";
+          }
+        }
+
+        for(var a = 0; a < 4; a++){
+
+
+          var position = (tempans.indexOf(parseInt(cutguess[a])));
+
+            if(position > -1 && cutguess[a] != tempans[a]){
+
+              var where = Math.floor(Math.random() * pegpos.length);
+
+              var rights = (pegpos[where]);
+
+              pegpos.splice(where, 1);
+
+              c.fillStyle = "#FF0077";
+
+              if(rights == 1){
+                c.beginPath();
+                c.arc(nx + 10,720,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+              } else if(rights == 2){
+                c.beginPath();
+                c.arc(nx + 30,720,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+              }else if(rights == 3){
+                c.beginPath();
+                c.arc(nx + 10,740,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+              }else if(rights == 4){
+                c.beginPath();
+                c.fillStyle = "#FF0077";
+                c.arc(nx + 30,740,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fill();
+                c.closePath();
+              }
+              tempans[position] = "r";
+              cutguess[a]= "s";
+            }
+
+        }//for a
+
+        if(qwin == 4 || cnumguess == 35){
+          ans = [c1,c2,c3,c4];
+          canvas.removeEventListener("keydown", L1game);
+          end(qwin,cnumguess,ans);
+        }
+
+      }//if last cnumguess
+
+  }//L1game
+
+}//first
+
+function second(){
+  c.clearRect(0,0,canvas.width,canvas.height);
+
+  var byeform = document.querySelector("#choosediff");
+  byeform.classList.add("gone");
+
+/* Drawing the empty spots */
+    var fx = -30;
+    for (var xspots = 0; xspots < 9; xspots++){
+      fx+=100;
+      var fy = 190;
+
+      for(var yspots = 0; yspots < 5; yspots++){
+        c.strokeStyle = "white";
+        c.fillStyle = "white";
+        c.strokeWidth = 5;
+        c.fillRect(fx, fy, 35, 35);
+        c.fill();
+        c.stroke();
+        fy+= 100;
+      }
+    }
+
+/* Drawing the empty bottom teller thingie */
+      var tx = 60;
+      for(var tspots = 0; tspots < 9; tspots++){
+        c.strokeStyle = "white";
+        c.fillStyle = "white";
+        c.strokeWidth = 5;
+        c.fillRect(tx, 700, 60, 60);
+        c.fill();
+        c.stroke();
+
+        tx += 100;
+      }
+
+
+/* AI picks a Code */
+
+    /*
+        1 = blue
+        2 = red
+        3 = green
+        4 = yellow
+        5 = black
+        6 = white
+        7 = purple
+        8 = orange
+     */
+
+var ans = [];
+
+var alluguess = [];
+
+var c1 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c1);
+var c2 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c2);
+var c3 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c3);
+var c4 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c4);
+var c5 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c5);
+
+
+
+  alert("code is " + ans);
+
+
+  var cnumguess = -1;
+
+
+  canvas.addEventListener("keydown", L2game);
+
+  function L2game(e){
+    var uguess = String.fromCharCode(e.keyCode);
+
+    alluguess.push(uguess);
+
+    cnumguess += 1;
+
+    if(cnumguess < 5){
+
+      var nx = 70;
+      var ny = 190 + 100 * cnumguess;
+
+    }else if (4 < cnumguess && cnumguess < 10){
+
+      var nx = 170;
+      var ny = 190 + 100 * (cnumguess - 5);
+
+    }else if (9 < cnumguess && cnumguess < 15){
+      var nx = 270;
+      var ny = 190 + 100 * (cnumguess - 10);
+
+    }else if (14 < cnumguess && cnumguess < 20){
+      var nx = 370;
+      var ny = 190 + 100 * (cnumguess - 15);
+
+    }else if (19 < cnumguess && cnumguess < 25){
+      var nx = 470;
+      var ny = 190 + 100 * (cnumguess - 20);
+
+    }else if (24 < cnumguess && cnumguess < 30){
+      var nx = 570;
+      var ny = 190 + 100 * (cnumguess - 25);
+
+    }else if (29 < cnumguess && cnumguess < 35){
+      var nx = 670;
+      var ny = 190 + 100 * (cnumguess - 30);
+
+    }else if (34 < cnumguess && cnumguess < 40){
+      var nx = 770;
+      var ny = 190 + 100 * (cnumguess - 35);
+
+    }else if (39 < cnumguess && cnumguess < 45){
+      var nx = 870;
+      var ny = 190 + 100 * (cnumguess - 40);
+    }
+
+
+      if(uguess == '1'){
+
+        c.fillStyle = "#75AAFC";
+        c.fillRect(nx, ny, 35, 35);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "blue";
+        c.fillText("1", nx + 13, ny + 27);
+
+      }else if(uguess == '2'){
+
+        c.fillStyle = "#EB9185";
+        c.fillRect(nx, ny, 35, 35);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "red";
+        c.fillText("2", nx + 13, ny + 27);
+
+      } else if(uguess == '3'){
+
+        c.fillStyle = "#83FF9A";
+        c.fillRect(nx, ny, 35, 35);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "green";
+        c.fillText("3", nx + 13, ny + 27);
+
+      }else if(uguess == '4'){
+
+        c.fillStyle = "#EEE294";
+        c.fillRect(nx, ny, 35, 35);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "#968F00";
+        c.fillText("4", nx + 13, ny + 27);
+
+      }else if(uguess == '5'){
+
+        c.fillStyle = "#212121";
+        c.fillRect(nx, ny, 35, 35);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "white";
+        c.fillText("5", nx + 13, ny + 27);
+
+      }else if(uguess == '6'){
+
+        c.fillStyle = "#F7F7F7";
+        c.fillRect(nx, ny, 35, 35);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "black";
+        c.fillText("6", nx + 11, ny + 27);
+
+      }else if(uguess == '7'){
+
+        c.fillStyle = "#D6A0FA";
+        c.fillRect(nx, ny, 35, 35);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "#9600FA";
+        c.fillText("7", nx + 11, ny + 27);
+
+      }else if(uguess == '8'){
+
+        c.fillStyle = "#FFB271";
+        c.fillRect(nx, ny, 35, 35);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "#FF5E00";
+        c.fillText("8", nx + 11, ny + 27);
+
+      }//uguess ifs
+
+      if(cnumguess == 4 || cnumguess == 9 || cnumguess == 14 || cnumguess == 19 || cnumguess == 24 || cnumguess == 29 || cnumguess == 34 ||cnumguess == 39 || cnumguess == 44){
+
+        ans = [c1,c2,c3,c4,c5];
+
+        var tempans = ans;
+
+        var qwin = 0;
+
+        var cutguess = (alluguess.slice((cnumguess - 4), (cnumguess + 1)));
+
+        var pegpos = [1,2,3,4,5];
+
+        for(var b = 0; b < 5; b++){
+          if(cutguess[b] == tempans[b]){
+
+            var where = Math.floor(Math.random() * pegpos.length);
+
+            var rights = (pegpos[where]);
+
+            pegpos.splice(where, 1);
+
+            qwin += 1;
+
+            if(rights == 1){
+              c.beginPath();
+              c.arc(nx + 10,720,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+
+            } else if(rights == 2){
+              c.beginPath();
+              c.arc(nx + 30 ,720,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+            }else if(rights == 3){
+              c.beginPath();
+              c.arc(nx + 10,740,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+            }else if(rights == 4){
+              c.beginPath();
+              c.arc(nx + 30,740,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+              c.closePath();
+            }else if (rights == 5){
+              c.beginPath();
+              c.fillStyle = "black";
+              c.arc(nx + 20 ,730,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fill();
+              c.closePath();
+            }
+            tempans[b] = "r";
+            cutguess[b]= "s";
+          }//if anything right
+        }
+
+        for(var a = 0; a < 5; a++){
+
+          var position = (tempans.indexOf(parseInt(cutguess[a])));
+
+            if(position > -1 && cutguess[a] != tempans[a]){
+
+              var where = Math.floor(Math.random() * pegpos.length);
+
+              var rights = (pegpos[where]);
+
+              pegpos.splice(where, 1);
+
+              c.fillStyle = "#FF0077";
+
+              if(rights == 1){
+                c.beginPath();
+                c.arc(nx + 10,720,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+              } else if(rights == 2){
+                c.beginPath();
+                c.arc(nx + 30,720,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+              }else if(rights == 3){
+                c.beginPath();
+                c.arc(nx + 10,740,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+              }else if(rights == 4){
+                c.beginPath();
+                c.fillStyle = "#FF0077";
+                c.arc(nx + 30,740,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fill();
+                c.closePath();
+              }else if (rights == 5){
+                c.beginPath();
+                c.fillStyle = "#FF0077";
+                c.arc(nx + 20,730,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fill();
+                c.closePath();
+              }
+              tempans[position] = "r";
+              cutguess[a]= "s";
+            }
+
+        }//for a
+
+        if(qwin == 5 || cnumguess == 44){
+          ans = [c1,c2,c3,c4,c5];
+          canvas.removeEventListener("keydown", L2game);
+          end(qwin,cnumguess,ans);
+        }
+
+      }//if last cnumguess
+
+  }//L2game
+
+}//second
+
+function third(){
+  c.clearRect(0,0,canvas.width,canvas.height);
+
+  var byeform = document.querySelector("#choosediff");
+  byeform.classList.add("gone");
+
+/* Drawing the empty spots */
+    var fx = -30;
+    for (var xspots = 0; xspots < 9; xspots++){
+      fx+=100;
+      var fy = 190;
+
+      for(var yspots = 0; yspots < 6; yspots++){
+        c.strokeStyle = "white";
+        c.fillStyle = "white";
+        c.strokeWidth = 5;
+        c.fillRect(fx, fy, 30, 30);
+        c.fill();
+        c.stroke();
+        fy+= 75;
+      }
+    }
+
+/* Drawing the empty bottom teller thingie */
+      var tx = 60;
+      for(var tspots = 0; tspots < 9; tspots++){
+        c.strokeStyle = "white";
+        c.fillStyle = "white";
+        c.strokeWidth = 5;
+        c.fillRect(tx, 700, 60, 60);
+        c.fill();
+        c.stroke();
+
+        tx += 100;
+      }
+
+
+/* AI picks a Code */
+
+  /*
+      1 = blue
+      2 = red
+      3 = green
+      4 = yellow
+      5 = black
+      6 = white
+      7 = purple
+      8 = orange
+      9 = pink
+      0 = brown
+  */
+
+var ans = [];
+
+var alluguess = [];
+
+var c1 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c1);
+var c2 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c2);
+var c3 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c3);
+var c4 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c4);
+var c5 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c5);
+var c6 = (Math.floor(Math.random() * (6 - 1 + 1)) + 1 );
+ans.push(c6);
+
+alert("code is: " + ans);
+
+
+  var cnumguess = -1;
+
+
+  canvas.addEventListener("keydown", L3game);
+
+  function L3game(e){
+    var uguess = String.fromCharCode(e.keyCode);
+
+    alluguess.push(uguess);
+
+    cnumguess += 1;
+
+    if(cnumguess < 6){
+      var nx = 70;
+      var ny = 190 + 75 * cnumguess;
+
+    }else if (5 < cnumguess && cnumguess < 12){
+
+      var nx = 170;
+      var ny = 190 + 75 * (cnumguess - 6);
+
+    }else if (11 < cnumguess && cnumguess < 18){
+      var nx = 270;
+      var ny = 190 + 75 * (cnumguess - 12);
+
+    }else if (17 < cnumguess && cnumguess < 24){
+      var nx = 370;
+      var ny = 190 + 75 * (cnumguess - 18);
+
+    }else if (23 < cnumguess && cnumguess < 30){
+      var nx = 470;
+      var ny = 190 + 75 * (cnumguess - 24);
+
+    }else if (29 < cnumguess && cnumguess < 36){
+      var nx = 570;
+      var ny = 190 + 75 * (cnumguess - 30);
+
+    }else if (35 < cnumguess && cnumguess < 42){
+      var nx = 670;
+      var ny = 190 + 75 * (cnumguess - 36);
+
+    }else if (41 < cnumguess && cnumguess < 48){
+      var nx = 770;
+      var ny = 190 + 75 * (cnumguess - 42);
+
+    }else if (47 < cnumguess && cnumguess < 54){
+      var nx = 870;
+      var ny = 190 + 75 * (cnumguess - 48);
+    }
+
+
+      if(uguess == '1'){
+
+        c.fillStyle = "#75AAFC";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "blue";
+        c.fillText("1", nx + 13, ny + 27);
+
+      }else if(uguess == '2'){
+
+        c.fillStyle = "#EB9185";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "red";
+        c.fillText("2", nx + 13, ny + 27);
+
+      } else if(uguess == '3'){
+
+        c.fillStyle = "#83FF9A";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "green";
+        c.fillText("3", nx + 13, ny + 27);
+
+      }else if(uguess == '4'){
+
+        c.fillStyle = "#EEE294";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "#968F00";
+        c.fillText("4", nx + 13, ny + 27);
+
+      }else if(uguess == '5'){
+
+        c.fillStyle = "#212121";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "white";
+        c.fillText("5", nx + 13, ny + 27);
+
+      }else if(uguess == '6'){
+
+        c.fillStyle = "#F7F7F7";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "black";
+        c.fillText("6", nx + 11, ny + 27);
+
+      }else if(uguess == '7'){
+
+        c.fillStyle = "#D6A0FA";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "#9600FA";
+        c.fillText("7", nx + 11, ny + 27);
+
+      }else if(uguess == '8'){
+
+        c.fillStyle = "#FFB271";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "#FF5E00";
+        c.fillText("8", nx + 11, ny + 27);
+
+      }else if(uguess == '9'){
+
+        c.fillStyle = "#FFC1CC";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "#FF018E";
+        c.fillText("9", nx + 11, ny + 27);
+
+      }else if(uguess = '0'){
+
+        c.fillStyle = "#CAB69E";
+        c.fillRect(nx, ny, 30, 30);
+        c.closePath();
+
+        c.font = "25px Courier New";
+        c.fillStyle = "#654321 ";
+        c.fillText("0", nx + 8, ny + 27);
+
+      }//uguess ifs
+
+
+      if(cnumguess == 5 || cnumguess == 11 || cnumguess == 17 || cnumguess == 23 || cnumguess == 29 || cnumguess == 35 || cnumguess == 41 ||cnumguess == 47 || cnumguess == 53 ){
+
+        ans = [c1,c2,c3,c4,c5,c6];
+        var tempans = ans;
+
+        var qwin = 0;
+
+        var cutguess = (alluguess.slice((cnumguess - 5), (cnumguess + 1)));
+
+        var pegpos = [1,2,3,4,5,6];
+
+        for(var b = 0; b < 6; b++){
+          if(cutguess[b] == tempans[b]){
+
+            var where = Math.floor(Math.random() * pegpos.length);
+
+            var rights = (pegpos[where]);
+
+            pegpos.splice(where, 1);
+
+            qwin += 1;
+
+            if(rights == 1){
+              c.beginPath();
+              c.arc(nx + 5,720,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+            } else if(rights == 2){
+              c.beginPath();
+              c.arc(nx + 20 ,720,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+            }else if(rights == 3){
+              c.beginPath();
+              c.arc(nx + 35,720,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+            }else if(rights == 4){
+              c.beginPath();
+              c.arc(nx + 5,740,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+              c.closePath();
+            }else if(rights == 5){
+              c.beginPath();
+              c.arc(nx + 20,740,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+              c.closePath()
+            }else if(rights == 6){
+              c.beginPath();
+              c.arc(nx + 35,740,3,0,Math.PI * 2, true);
+              c.stroke();
+              c.fillStyle = "black";
+              c.fill();
+              c.closePath()
+            }
+            tempans[b] = "r";
+            cutguess[b]= "s";
+
+          }
+        }
+
+        for(var a = 0; a < 6; a++){
+
+          var position = (tempans.indexOf(parseInt(cutguess[a])));
+
+            if(position > -1 && cutguess[a] != tempans[a]){
+
+              var where = Math.floor(Math.random() * pegpos.length);
+
+              var rights = (pegpos[where]);
+
+              pegpos.splice(where, 1);
+
+              if(rights == 1){
+                c.beginPath();
+                c.arc(nx + 5,720,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+              } else if(rights == 2){
+                c.beginPath();
+                c.arc(nx + 20 ,720,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+              }else if(rights == 3){
+                c.beginPath();
+                c.arc(nx + 35,720,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+              }else if(rights == 4){
+                c.beginPath();
+                c.arc(nx + 5,740,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+                c.closePath();
+              }else if(rights == 5){
+                c.beginPath();
+                c.arc(nx + 20,740,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+                c.closePath()
+              }else if(rights == 6){
+                c.beginPath();
+                c.arc(nx + 35,740,3,0,Math.PI * 2, true);
+                c.stroke();
+                c.fillStyle = "#FF0077";
+                c.fill();
+                c.closePath()
+              }
+              tempans[position] = "r";
+              cutguess[a]= "s";
+            }
+
+        }//for a
+
+        if(qwin == 6 || cnumguess == 53){
+          //ans = [c1,c2,c3,c4,c5,c6];
+          ans = [2,3,1,1,6,2];
+          canvas.removeEventListener("keydown", L3game);
+          end(qwin,cnumguess,ans);
+        }
+
+      }//if last cnumguess
+
+  }//L3game
+
+}//third
+
+function end(pqwin, pcnumguess,pans){
+alert(pqwin);
+  if(pqwin == 4 || pqwin == 5 || pqwin == 6){
+
+    c.fillStyle = "green";
+    c.font = "30px Courier";
+    c.fillText("CODE INDENTIFIED.", 350, 30);
+
+    c.font = "20px Serif";
+    c.fillText("Congratulations, you've opened the safe and ran out with your stash on money!", 200, 80);
+    c.fillText("GAME OVER", 425, 120);
+
+  }else{
+
+    c.fillStyle = "red";
+    c.font = "30px Courier";
+    c.fillText("CODE NOT INDENTIFIED. KEYPAD DISABLED.", 200, 30);
+
+    c.font = "20px Serif";
+    c.fillText("Sorry to say but it seems like you're stuck here. Maybe jail will be a fun experience?", 150, 50);
+
+    c.fillStyle = "white";
+    c.fillText("The answer was: ", 400, 80);
+
+    if(pcnumguess == 35){
+
+      for(var d = 1; d < 5; d++){
+
+        var ax = (d * 50) + 350;
+
+        if(pans[d-1] == 1){
+
+          c.fillStyle = "#75AAFC";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "blue";
+          c.fillText("1", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 2){
+
+          c.fillStyle = "#EB9185";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "red";
+          c.fillText("2", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 3){
+
+          c.fillStyle = "#83FF9A";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "green";
+          c.fillText("3", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 4){
+
+          c.fillStyle = "#EEE294";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "#968F00";
+          c.fillText("4", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 5){
+
+          c.fillStyle = "#212121";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "white";
+          c.fillText("5", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 6){
+
+          c.fillStyle = "#F7F7F7";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "black";
+          c.fillText("6", ax + 10, 100 + 27);
+        }
+
+      }//for d
+
+    }else if(pcnumguess == 44){
+
+      for(var d = 1; d < 6; d++){
+
+        var ax = (d * 50) + 300;
+
+        if(pans[d-1] == 1){
+
+          c.fillStyle = "#75AAFC";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "blue";
+          c.fillText("1", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 2){
+
+          c.fillStyle = "#EB9185";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "red";
+          c.fillText("2", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 3){
+
+          c.fillStyle = "#83FF9A";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "green";
+          c.fillText("3", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 4){
+
+          c.fillStyle = "#EEE294";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "#968F00";
+          c.fillText("4", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 5){
+
+          c.fillStyle = "#212121";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "white";
+          c.fillText("5", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 6){
+
+          c.fillStyle = "#F7F7F7";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "black";
+          c.fillText("6", ax + 10, 100 + 27);
+
+        } else if(pans[d-1] == 7){
+
+          c.fillStyle = "#D6A0FA";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "#9600FA";
+          c.fillText("7", nx + 11, 127);
+
+        } else if(pans[d-1] == 8){
+
+          c.fillStyle = "#FFB271";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "#FF5E00";
+          c.fillText("8", ax + 11, 127);
+        }
+
+      }//for d
+
+    }else if (pcnumguess == 53){
+
+      for(var d = 1; d < 7; d++){
+
+        var ax = (d * 50) + 300;
+
+        if(pans[d-1] == 1){
+
+          c.fillStyle = "#75AAFC";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "blue";
+          c.fillText("1", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 2){
+
+          c.fillStyle = "#EB9185";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "red";
+          c.fillText("2", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 3){
+
+          c.fillStyle = "#83FF9A";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "green";
+          c.fillText("3", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 4){
+
+          c.fillStyle = "#EEE294";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "#968F00";
+          c.fillText("4", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 5){
+
+          c.fillStyle = "#212121";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "white";
+          c.fillText("5", ax + 10, 100 + 27);
+
+        }else if(pans[d-1] == 6){
+
+          c.fillStyle = "#F7F7F7";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "black";
+          c.fillText("6", ax + 10, 100 + 27);
+
+        } else if(pans[d-1] == 7){
+
+          c.fillStyle = "#D6A0FA";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "#9600FA";
+          c.fillText("7", nx + 11, 127);
+
+        } else if(pans[d-1] == 8){
+
+          c.fillStyle = "#FFB271";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "#FF5E00";
+          c.fillText("8", ax + 11, 127);
+
+        } else if(pans[d-1] == 9){
+
+          c.fillStyle = "#FFC1CC";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "#FF018E";
+          c.fillText("9", ax + 11, 127);
+
+        } else if(pans[d-1] == 0){
+
+          c.fillStyle = "#CAB69E";
+          c.fillRect(ax, 100, 35, 35);
+          c.closePath();
+
+          c.font = "25px Courier New";
+          c.fillStyle = "#654321 ";
+          c.fillText("0", ax + 8, 127);
+        }
+
+
+      }//for d
+
+    }//giving real code
+
+
+  }//if wrong
+
+  var hiform = document.querySelector("#choosediff");
+  hiform.classList.remove("gone");
+
+}//end
+
+  </script>
+
+</div>
+</body>
+
+</html>
